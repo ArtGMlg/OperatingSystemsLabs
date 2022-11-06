@@ -46,5 +46,5 @@ void main()
             }
         }        
     }
-    
+    SetConsoleMode(hStdIn, cm);
 }
