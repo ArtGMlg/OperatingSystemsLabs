@@ -2,6 +2,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "windows.h"
+#include <ctype.h>
 
 void main()
 {
@@ -37,12 +38,20 @@ void main()
                 }
                 if ((GetKeyState(VK_LBUTTON) & 0x80) != 0)
                 {
-                    SetConsoleCursorPosition(hStdIn, irInBuf->Event.MouseEvent.dwMousePosition);
-                    printf("\n%d %d", irInBuf->Event.MouseEvent.dwMousePosition.X, irInBuf->Event.MouseEvent.dwMousePosition.Y);
+                    char buf[2];
+                    DWORD num_read;
+                    COORD pos = irInBuf->Event.MouseEvent.dwMousePosition;
+                    ReadConsoleOutputCharacter(GetStdHandle(STD_OUTPUT_HANDLE), (LPTSTR)buf, 1, pos, (LPDWORD)&num_read);
+                    printf("\n%s %d %d", buf, pos.X, pos.Y);
+                    CONSOLE_SCREEN_BUFFER_INFO cb;
+                    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cb);
+                    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
+                    char ch;
+                    ch = buf[0];
+                    putchar(toupper(ch));
+                    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cb.dwCursorPosition);
                 }
                 break;
-            default:
-                printf("\nNo such event handler implemented");
             }
         }        
     }
